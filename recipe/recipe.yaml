@@ -3,7 +3,7 @@ schema_version: 1
 
 context:
   name: hcl2json
-  version: "0.6.7"
+  version: "0.6.8"
 
 package:
   name: ${{ name|lower }}
@@ -11,7 +11,7 @@ package:
 
 source:
   url: https://github.com/tmccombs/hcl2json/archive/v${{ version }}.tar.gz
-  sha256: 868a6986ae983b703c9845f315b27ab19207b816a8f16f6d44041e4d78764f70
+  sha256: 681ef77f32b86a065158575997c48420be148dd4308c4e0bea9c3e617b0f4047
 
 
 build:
