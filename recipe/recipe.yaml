@@ -9,7 +9,7 @@ context:
   go_bin: ${{ "%PREFIX%\\bin\\" ~ name ~ ".exe" if win else "$PREFIX/bin/" ~ name }}
   # `go licenses` includes the entire `hcl` source with paths too long for windows
   cp: ${{ "copy" if win else "cp" }}
-  rm: ${{ "del" if win else "rm -rf" }}
+  rm: ${{ "del /s /q" if win else "rm -rf" }}
   md: ${{ "md" if win else "mkdir" }}
   slash: ${{ "\\" if win else "/" }}
   hcl_mod: github.com${{ slash }}hashicorp${{ slash }}hcl${{ slash }}v2
