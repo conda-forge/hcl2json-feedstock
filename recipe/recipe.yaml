@@ -6,7 +6,7 @@ context:
   name: hcl2json
   go_mod: github.com/tmccombs/${{ name }}
   go_build: go build -v -buildmode=pie -trimpath -modcacherw -ldflags "-X main.version=${{ version }}"
-  go_bin: ${{ "%PREFIX%\\" ~ name ~ ".exe" if win else "$PREFIX/bin/" ~ name }}
+  go_bin: ${{ "%PREFIX%\\bin\\" ~ name ~ ".exe" if win else "$PREFIX/bin/" ~ name }}
 
 package:
   name: ${{ name }}
@@ -23,6 +23,7 @@ build:
     env:
       GOPATH: ${{ SRC_DIR }}
     content:
+      - cd ${{ go_mod }}
       - ${{ go_build }} -o "${{ go_bin }}"
       - go-licenses save . --save_path "${{ SRC_DIR }}/thirdparty" --ignore ${{ go_mod }}
 
@@ -46,7 +47,7 @@ about:
   summary: Convert hcl2 to json
   license: Apache-2.0
   license_file:
-    - LICENSE
+    - ${{ go_mod }}/LICENSE
     - thirdparty/
   repository: https://${{ go_mod }}
 
