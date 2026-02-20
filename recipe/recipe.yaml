@@ -2,31 +2,45 @@
 schema_version: 1
 
 context:
-  name: hcl2json
   version: "0.6.8"
+  name: hcl2json
+  go_mod: github.com/tmccombs/${{ name }}
+  go_build: go build -v -buildmode=pie -trimpath -modcacherw -ldflags "-X main.version=${{ version }}"
+  go_bin: ${{ "%PREFIX%\\bin\\" ~ name ~ ".exe" if win else "$PREFIX/bin/" ~ name }}
+  # `go licenses` includes the entire `hcl` source with paths too long for windows
+  cp: ${{ "copy" if win else "cp" }}
+  rm: ${{ "del /s /q" if win else "rm -rf" }}
+  slash: ${{ "\\" if win else "/" }}
+  hcl_mod: github.com${{ slash }}hashicorp${{ slash }}hcl${{ slash }}v2
 
 package:
-  name: ${{ name|lower }}
+  name: ${{ name }}
   version: ${{ version }}
 
 source:
-  url: https://github.com/tmccombs/hcl2json/archive/v${{ version }}.tar.gz
+  url: https://${{ go_mod }}/archive/v${{ version }}.tar.gz
   sha256: 681ef77f32b86a065158575997c48420be148dd4308c4e0bea9c3e617b0f4047
-
+  target_directory: ${{ go_mod }}
 
 build:
-  number: 0
+  number: 1
   script:
-    file: build
     env:
-      BINARY_NAME: hcl2json${{ ".exe" if win }}
-
+      GOPATH: ${{ SRC_DIR }}
+    content:
+      - cd ${{ go_mod }}
+      - ${{ go_build }} -o "${{ go_bin }}"
+      - go-licenses save . --save_path "${{ SRC_DIR }}${{ slash }}thirdparty" --ignore ${{ go_mod }}
+      # clean out long paths
+      - cd "${{ SRC_DIR }}${{ slash }}thirdparty"
+      - ${{ cp }} "${{ hcl_mod }}${{ slash }}LICENSE" "${{ SRC_DIR }}${{ slash }}hcl_LICENSE"
+      - ${{ rm }} "${{ hcl_mod }}${{ slash }}*"
+      - ${{ cp }} "${{ SRC_DIR }}${{ slash }}hcl_LICENSE" "${{ hcl_mod }}${{ slash }}LICENSE"
 
 requirements:
   build:
     - ${{ compiler('go-nocgo') }}
     - go-licenses
-
 
 tests:
   - requirements:
@@ -38,16 +52,16 @@ tests:
         - if: not win
           then: hcl2json --version | rg '${{ version }}'
 
-
 about:
-  homepage: https://github.com/tmccombs/hcl2json
-  summary: 'Convert hcl2 to json'
+  homepage: https://pkg.go.dev/${{ go_mod }}
+  summary: Convert hcl2 to json
   license: Apache-2.0
   license_file:
-    - LICENSE
+    - ${{ go_mod }}/LICENSE
     - thirdparty/
-  repository: https://github.com/tmccombs/hcl2json
+  repository: https://${{ go_mod }}
 
 extra:
   recipe-maintainers:
     - dhirschfeld
+    - bollwyvl
