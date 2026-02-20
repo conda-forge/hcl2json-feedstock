@@ -10,7 +10,6 @@ context:
   # `go licenses` includes the entire `hcl` source with paths too long for windows
   cp: ${{ "copy" if win else "cp" }}
   rm: ${{ "del /s /q" if win else "rm -rf" }}
-  md: ${{ "md" if win else "mkdir" }}
   slash: ${{ "\\" if win else "/" }}
   hcl_mod: github.com${{ slash }}hashicorp${{ slash }}hcl${{ slash }}v2
 
@@ -35,8 +34,7 @@ build:
       # clean out long paths
       - cd "${{ SRC_DIR }}${{ slash }}thirdparty"
       - ${{ cp }} "${{ hcl_mod }}${{ slash }}LICENSE" "${{ SRC_DIR }}${{ slash }}hcl_LICENSE"
-      - ${{ rm }} "${{ hcl_mod }}"
-      - ${{ md }} "${{ hcl_mod }}" || echo "ok"
+      - ${{ rm }} "${{ hcl_mod }}${{ slash }}*"
       - ${{ cp }} "${{ SRC_DIR }}${{ slash }}hcl_LICENSE" "${{ hcl_mod }}${{ slash }}LICENSE"
 
 requirements:
