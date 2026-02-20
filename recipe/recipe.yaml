@@ -36,7 +36,7 @@ build:
       - cd "${{ SRC_DIR }}${{ slash }}thirdparty"
       - ${{ cp }} "${{ hcl_mod }}${{ slash }}LICENSE" "${{ SRC_DIR }}${{ slash }}hcl_LICENSE"
       - ${{ rm }} "${{ hcl_mod }}"
-      - ${{ md }} "${{ hcl_mod }}"
+      - ${{ md }} "${{ hcl_mod }}" || echo "ok"
       - ${{ cp }} "${{ SRC_DIR }}${{ slash }}hcl_LICENSE" "${{ hcl_mod }}${{ slash }}LICENSE"
 
 requirements:
