@@ -7,6 +7,11 @@ context:
   go_mod: github.com/tmccombs/${{ name }}
   go_build: go build -v -buildmode=pie -trimpath -modcacherw -ldflags "-X main.version=${{ version }}"
   go_bin: ${{ "%PREFIX%\\bin\\" ~ name ~ ".exe" if win else "$PREFIX/bin/" ~ name }}
+  # `go licenses` includes the entire `hcl` source with paths too long for windows
+  hcl_mod: github.com/hashicorp/hcl/v2
+  cp: ${{ "copy" if win else "cp" }}
+  rm: ${{ "del" if win else "rm -rf" }}
+  md: ${{ "md" if win else "mkdir" }}
 
 package:
   name: ${{ name }}
@@ -26,6 +31,12 @@ build:
       - cd ${{ go_mod }}
       - ${{ go_build }} -o "${{ go_bin }}"
       - go-licenses save . --save_path "${{ SRC_DIR }}/thirdparty" --ignore ${{ go_mod }}
+      # clean out long paths
+      - cd ${{ SRC_DIR }}/thirdparty
+      - ${{ cp }} ${{ hcl_mod }}/LICENSE ${{ SRC_DIR }}/hcl_LICENSE
+      - ${{ rm }} ${{ hcl_mod }}
+      - ${{ md }} ${{ hcl_mod }}
+      - ${{ cp }} ${{ SRC_DIR }}/hcl_LICENSE ${{ hcl_mod }}/LICENSE
 
 requirements:
   build:
